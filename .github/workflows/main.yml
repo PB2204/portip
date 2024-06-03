@@ -32,20 +32,30 @@ jobs:
     - name: Build DEB package
       run: dpkg-deb --build debian portip.deb
 
-    - name: Upload DEB package to GitHub Packages
+    - name: Upload DEB package as artifact
       uses: actions/upload-artifact@v2
       with:
         name: portip-deb
         path: portip.deb
 
-    - name: Publish to GitHub Packages
-      uses: svenstaro/upload-release-action@v2
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: portip.deb
-        asset_name: portip.deb
-        tag: v1.0.0
+        tag_name: v1.0.0
         release_name: "PortIP v1.0.0"
         body: "Initial release of PortIP tool"
         draft: false
         prerelease: false
+
+    - name: Upload DEB to GitHub Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./portip.deb
+        asset_name: portip.deb
+        asset_content_type: application/octet-stream
