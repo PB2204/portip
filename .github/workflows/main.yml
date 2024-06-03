@@ -1,0 +1,48 @@
+name: Publish DEB Package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install required dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip debhelper dpkg-dev
+
+    - name: Build DEB package
+      run: dpkg-deb --build debian
+
+    - name: Upload DEB package to GitHub Packages
+      uses: actions/upload-artifact@v2
+      with:
+        name: portip-deb
+        path: debian.deb
+
+    - name: Publish to GitHub Packages
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: debian.deb
+        asset_name: portip.deb
+        tag: v1.0.0
+        release_name: "PortIP v1.0.0"
+        body: "Initial release of PortIP tool"
+        draft: false
+        prerelease: false
