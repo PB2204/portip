@@ -27,19 +27,19 @@ jobs:
         sudo apt-get install -y python3 python3-pip debhelper dpkg-dev
 
     - name: Build DEB package
-      run: dpkg-deb --build debian
+      run: dpkg-deb --build debian portip.deb
 
     - name: Upload DEB package to GitHub Packages
       uses: actions/upload-artifact@v2
       with:
         name: portip-deb
-        path: debian.deb
+        path: portip.deb
 
     - name: Publish to GitHub Packages
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: debian.deb
+        file: portip.deb
         asset_name: portip.deb
         tag: v1.0.0
         release_name: "PortIP v1.0.0"
